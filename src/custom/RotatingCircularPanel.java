@@ -14,11 +14,11 @@ import java.util.Random;
 public class RotatingCircularPanel extends JPanel {
 
 
-    int count;
-
+    //int count;
+double count;
     int countToChangeAddToCount = 0;
     int countChange = 5;
-    int addToCount = 20;
+    double addToCount = 20;
     int acelerate = -1;
 
     Timer timer;
@@ -32,10 +32,15 @@ public class RotatingCircularPanel extends JPanel {
     // keep track of the current rotation
     double angle =0.0d;
 
+    //parent class calls rotate method and the setAngle is set
+    double setAngle=0.0d;
+
+
+
     public RotatingCircularPanel() {
 
         setTimer();
-        setMouseListener();
+        //setMouseListener();
 
     }
 
@@ -62,22 +67,33 @@ public class RotatingCircularPanel extends JPanel {
 
 
     private void setTimer() {
+
+        double dr = Math.floor(angleOfRotation)/angleOfRotation;
+
+
+
         timer = new Timer(40, new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 //count += 10;
-                countToChangeAddToCount++;
+               /* countToChangeAddToCount++;
                 if (countToChangeAddToCount == countChange) {
                     addToCount = Math.max(1, addToCount + acelerate);
                     countToChangeAddToCount = 0;
 
-                    if(count >= 500){
+                    if(count >= setAngle){
                         rotating = false;
                     }
 
+                }*/
+
+                System.out.println(count);
+                if(count >= setAngle){
+                    rotating = false;
                 }
-                count += addToCount;
+
+                count += dr;
 
 
                 if (count > 360) count -= 360;
@@ -89,14 +105,14 @@ public class RotatingCircularPanel extends JPanel {
 
     }
 
-    private void setMouseListener() {
+   /* private void setMouseListener() {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent m) {
 
                 //rotate(angleOfRotation);
-              rotate(3000.0d);
-                /*if (rotating) {
+              rotate(1);
+                *//*if (rotating) {
                     rotating = false;
                     timer.stop();
                     count = 0;
@@ -105,26 +121,35 @@ public class RotatingCircularPanel extends JPanel {
                 } else {
                     rotating = true;
                     timer.start();
-                }*/
+                }*//*
             }
         });
-    }
+    }*/
+
 public double getAngle(){
     return this.angle;
 }
+
     public void setAngleOfRotation(double angleToRotate){
         angleOfRotation = angleToRotate;
     }
+
     public void rotate(double angle){
         rotating = true;
-        this.angle+=angle;
-        repaint();
+        this.setAngle = angle;
+        setTimer();
+        timer.start();
+        //this.angle+=angle;
+        //repaint();
     }
     public void rotate(int positions){
         rotating = true;
-        this.angle+=positions*angleOfRotation;
-        paintComponent(g2d);
-        repaint();
+        this.setAngle = positions*angleOfRotation;
+        setTimer();
+        timer.start();
+        //this.angle+=positions*angleOfRotation;
+        //paintComponent(g2d);
+        //repaint();
     }
 }
 

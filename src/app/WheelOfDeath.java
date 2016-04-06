@@ -37,6 +37,12 @@ public class WheelOfDeath {
     private final int MENU2_MODE_INIT_INDEX = 2;
 
 
+    //circular pie
+    double pieAngle;
+
+
+
+
     public static void main(String[] args) {
         WheelOfDeath wheelOfDeath = new WheelOfDeath();
 
@@ -52,16 +58,17 @@ public class WheelOfDeath {
         wheelOfDeath.log("Load or create a pick list from the menu");
 
 
-        wheelOfDeath.loadData("C:\\Users\\macha\\Desktop\\namesabc.txt");
+        wheelOfDeath.loadData("/Users/codecadet/Desktop/test.txt");
 
     }
 
     private void start() {
-       // System.out.println(((JRadioButtonMenuItem) (menu2_spin.getMenuComponent( MENU2_MODE_INIT_INDEX))).isSelected());
-       // System.out.println(((JRadioButtonMenuItem) (menu2_spin.getMenuComponent( MENU2_MODE_INIT_INDEX+1))).isSelected());
-       // System.out.println(((JRadioButtonMenuItem) (menu2_spin.getMenuComponent( MENU2_MODE_INIT_INDEX+2))).isSelected());
+        // System.out.println(((JRadioButtonMenuItem) (menu2_spin.getMenuComponent( MENU2_MODE_INIT_INDEX))).isSelected());
+        // System.out.println(((JRadioButtonMenuItem) (menu2_spin.getMenuComponent( MENU2_MODE_INIT_INDEX+1))).isSelected());
+        // System.out.println(((JRadioButtonMenuItem) (menu2_spin.getMenuComponent( MENU2_MODE_INIT_INDEX+2))).isSelected());
 
         createPanel();
+
 
     }//end start
 
@@ -190,7 +197,7 @@ public class WheelOfDeath {
 
     private void createPanel() {
         //list is empty
-        if(currentList.getChooseList().size()<=0){
+        if (currentList.getChooseList().size() <= 0) {
             log("Current pick list is empty");
             return;
         }
@@ -212,6 +219,15 @@ public class WheelOfDeath {
         jPanel.setVisible(true);
 
 
+        jPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent m) {
+
+                ((RotatingCircularPanel) (jPanel)).rotate((double) rand(0,100,1)*pieAngle);
+            }
+        });
+
+
         jFrame.add(jPanel, BorderLayout.CENTER);
         jFrame.pack();
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -221,11 +237,12 @@ public class WheelOfDeath {
 
     private void createPiePanels() {
         Set<String> chooseList = new HashSet<String>();
-        int totalMenuComponents =    menu1_list.getMenuComponentCount();
+        int totalMenuComponents = menu1_list.getMenuComponentCount();
 
-        for (int i = MENU1_LIST_NAME_INDEX+2; i < totalMenuComponents; i++) {
-            if(((JCheckBoxMenuItem2)(menu1_list.getMenuComponent(i))).getState()==true){
-                chooseList.add(((JCheckBoxMenuItem2)(menu1_list.getMenuComponent(i))).getText());
+        //add elements to the picker
+        for (int i = MENU1_LIST_NAME_INDEX + 2; i < totalMenuComponents; i++) {
+            if (((JCheckBoxMenuItem2) (menu1_list.getMenuComponent(i))).getState() == true) {
+                chooseList.add(((JCheckBoxMenuItem2) (menu1_list.getMenuComponent(i))).getText());
 
             }
 
@@ -242,12 +259,12 @@ public class WheelOfDeath {
 */
         Object[] chooseNames = chooseList.toArray();
 
-Color[] colors = {Color.GRAY, Color.cyan, Color.RED, Color.GREEN, Color.PINK, Color.WHITE, Color.MAGENTA, Color.YELLOW, Color.BLUE, Color.ORANGE,Color.GRAY,
-        Color.cyan, Color.RED, Color.GREEN, Color.PINK, Color.WHITE, Color.MAGENTA};
+        Color[] colors = {Color.GRAY, Color.cyan, Color.RED, Color.GREEN, Color.PINK, Color.WHITE, Color.MAGENTA, Color.YELLOW, Color.BLUE, Color.ORANGE, Color.GRAY,
+                Color.cyan, Color.RED, Color.GREEN, Color.PINK, Color.WHITE, Color.MAGENTA};
 
 
         int totalNames = chooseNames.length;
-        double pieAngle = 360.0d / (totalNames);
+        pieAngle = 360.0d / (totalNames);
 
         //float rest = (360- (totalNames*pieAngle))/totalNames;
 
@@ -255,7 +272,7 @@ Color[] colors = {Color.GRAY, Color.cyan, Color.RED, Color.GREEN, Color.PINK, Co
         for (int i = 0; i < totalNames; i++) {
             //custom component
             double start = i * pieAngle;
-            double finish = start + pieAngle ;
+            double finish = start + pieAngle;
 
             MyPiePanel pie = new MyPiePanel(colors[i], start, finish, chooseNames[i].toString());
             pie.setName(chooseNames[i].toString());
@@ -267,10 +284,9 @@ Color[] colors = {Color.GRAY, Color.cyan, Color.RED, Color.GREEN, Color.PINK, Co
 
         }
 
-    //angle calculations
-        ((RotatingCircularPanel)(jPanel)).setAngleOfRotation(pieAngle);
-        ((RotatingCircularPanel)(jPanel)).rotate(pieAngle/2);
-
+        //angle calculations
+        ((RotatingCircularPanel) (jPanel)).setAngleOfRotation(pieAngle);
+        ((RotatingCircularPanel) (jPanel)).rotate((double) pieAngle / 2);
 
 
     }
@@ -345,7 +361,6 @@ Color[] colors = {Color.GRAY, Color.cyan, Color.RED, Color.GREEN, Color.PINK, Co
         rbModeCircleOfDeath = new JRadioButtonMenuItem("Circle of Death");
         rbModeCircleOfDeath.setSelected(true);
         group.add(rbModeCircleOfDeath);
-
 
 
         JCheckBoxMenuItem2 menu2Item2_modeTiledBoard;
@@ -624,16 +639,44 @@ Color[] colors = {Color.GRAY, Color.cyan, Color.RED, Color.GREEN, Color.PINK, Co
     }
 
 
-    private int rand(int min, int max) {
-        Random r = new Random();
+    private int rand(int min, int max, int interval) {
 
-        return r.nextInt(max - min) + min;
+        return (int) (Math.round(((Math.random() * 1000 * (Math.floor((max - min) / interval))) / 1000)) * interval) + min;
+
     }
 
-    private void log(String message){
+    private double randDouble(double min, double max, double interval) {
+
+        String text = Double.toString(Math.abs(interval));
+        int integerPlaces = text.indexOf('.');
+        int decimalPlaces_interval = text.length() - integerPlaces - 1;
+
+        text = Double.toString(Math.abs(min));
+        integerPlaces = text.indexOf('.');
+        int decimalPlaces_min = text.length() - integerPlaces - 1;
+
+        text = Double.toString(Math.abs(max));
+        integerPlaces = text.indexOf('.');
+        int decimalPlaces_max = text.length() - integerPlaces - 1;
+
+        int decimalPlaces = Math.max(decimalPlaces_interval, decimalPlaces_max);
+        decimalPlaces = Math.max(decimalPlaces, decimalPlaces_min);
+
+
+        double a = Math.round(Math.random() * Math.pow(10.0d, decimalPlaces));
+
+        a = a * Math.floor(((max - min) / interval));
+
+        double b = Math.round(a / (Math.pow(10.0d, decimalPlaces)));
+
+        return (b * interval) + min;
+
+    }
+
+
+    private void log(String message) {
         infoLbl.setText(message);
     }
-
 
 
     /**
