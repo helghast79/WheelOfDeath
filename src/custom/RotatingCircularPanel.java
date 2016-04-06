@@ -13,12 +13,10 @@ import java.util.Random;
  */
 public class RotatingCircularPanel extends JPanel {
 
-
-    //int count;
-double count;
+    int count;
     int countToChangeAddToCount = 0;
     int countChange = 5;
-    double addToCount = 20;
+    int addToCount = 20;
     int acelerate = -1;
 
     Timer timer;
@@ -26,21 +24,13 @@ double count;
 
     boolean rotating = false;
 
-    //the angle that the panel will apply when rotate is called
-    double angleOfRotation = 0.0d;
-
-    // keep track of the current rotation
-    double angle =0.0d;
-
-    //parent class calls rotate method and the setAngle is set
-    double setAngle=0.0d;
-
-
+    int totalCount = 0;
+    int targetCount = 0;
 
     public RotatingCircularPanel() {
 
         setTimer();
-        //setMouseListener();
+        setMouseListener();
 
     }
 
@@ -48,11 +38,11 @@ double count;
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         g2d = (Graphics2D) g;
-        if (rotating) {
+
             float x = this.getWidth() / 2.0f;
             float y = this.getHeight() / 2.0f;
-            g2d.rotate(Math.toRadians(angle),x,y);//count / 180.0 * Math.PI, x, y);
-        }
+            g2d.rotate(count / 180.0 * Math.PI, x, y);
+
 
 
     }
@@ -66,91 +56,63 @@ double count;
     }
 
 
-    private void setTimer() {
-
-        double dr = Math.floor(angleOfRotation)/angleOfRotation;
-
-
+    public void setTimer() {
 
         timer = new Timer(40, new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+
+                //stop criteria
+                if (totalCount >= targetCount) {
+                    countChange = Math.round(targetCount/10);
+                    addToCount = 20;
+                    totalCount = 0;
+                    repaint();
+                    timer.stop();
+
+                    return;
+                }
+
+
                 //count += 10;
-               /* countToChangeAddToCount++;
+                countToChangeAddToCount++;
                 if (countToChangeAddToCount == countChange) {
                     addToCount = Math.max(1, addToCount + acelerate);
                     countToChangeAddToCount = 0;
-
-                    if(count >= setAngle){
-                        rotating = false;
-                    }
-
-                }*/
-
-                System.out.println(count);
-                if(count >= setAngle){
-                    rotating = false;
                 }
-
-                count += dr;
-
+                count += addToCount;
+                totalCount+=addToCount;
 
                 if (count > 360) count -= 360;
                 repaint();
-
-
             }
         });
 
     }
 
-   /* private void setMouseListener() {
+    private void setMouseListener() {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent m) {
-
-                //rotate(angleOfRotation);
-              rotate(1);
-                *//*if (rotating) {
-                    rotating = false;
-                    timer.stop();
-                    count = 0;
-                    addToCount = 10;
-                    repaint();
-                } else {
+                if (!timer.isRunning()) {
+                    targetCount = rand(1999, 2000, 1);
+                    countChange = Math.round(targetCount/10);
+                    addToCount = 20;
                     rotating = true;
                     timer.start();
-                }*//*
+                }
             }
         });
-    }*/
-
-public double getAngle(){
-    return this.angle;
-}
-
-    public void setAngleOfRotation(double angleToRotate){
-        angleOfRotation = angleToRotate;
     }
 
-    public void rotate(double angle){
-        rotating = true;
-        this.setAngle = angle;
-        setTimer();
-        timer.start();
-        //this.angle+=angle;
-        //repaint();
+    private int rand(int min, int max, int interval) {
+
+        return (int) (Math.round(((Math.random() * 1000 * (Math.floor((max - min) / interval))) / 1000)) * interval) + min;
+
     }
-    public void rotate(int positions){
-        rotating = true;
-        this.setAngle = positions*angleOfRotation;
-        setTimer();
-        timer.start();
-        //this.angle+=positions*angleOfRotation;
-        //paintComponent(g2d);
-        //repaint();
-    }
+
+
 }
 
 

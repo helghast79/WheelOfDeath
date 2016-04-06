@@ -58,7 +58,7 @@ public class WheelOfDeath {
         wheelOfDeath.log("Load or create a pick list from the menu");
 
 
-        wheelOfDeath.loadData("/Users/codecadet/Desktop/test.txt");
+        wheelOfDeath.loadData("C:\\Users\\macha\\Desktop\\namesabc.txt");
 
     }
 
@@ -219,14 +219,14 @@ public class WheelOfDeath {
         jPanel.setVisible(true);
 
 
-        jPanel.addMouseListener(new MouseAdapter() {
+       /* jPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent m) {
 
-                ((RotatingCircularPanel) (jPanel)).rotate((double) rand(0,100,1)*pieAngle);
+                ((RotatingCircularPanel) (jPanel)).rotatePositions( rand(2, 10, 1) );
             }
         });
-
+*/
 
         jFrame.add(jPanel, BorderLayout.CENTER);
         jFrame.pack();
@@ -285,8 +285,8 @@ public class WheelOfDeath {
         }
 
         //angle calculations
-        ((RotatingCircularPanel) (jPanel)).setAngleOfRotation(pieAngle);
-        ((RotatingCircularPanel) (jPanel)).rotate((double) pieAngle / 2);
+        //((RotatingCircularPanel) (jPanel)).setAngleOfRotation(pieAngle);
+        //((RotatingCircularPanel) (jPanel)).setInitialAngle( pieAngle / 2);
 
 
     }
@@ -644,7 +644,6 @@ public class WheelOfDeath {
         return (int) (Math.round(((Math.random() * 1000 * (Math.floor((max - min) / interval))) / 1000)) * interval) + min;
 
     }
-
     private double randDouble(double min, double max, double interval) {
 
         String text = Double.toString(Math.abs(interval));
