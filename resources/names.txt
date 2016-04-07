@@ -1,0 +1,14 @@
+﻿# All lines starting with # will be ignored
+# each round is identified with the ">" char following the name of the list
+# second line will contain all the names for the lottery pick up, all names should be separated by slash "/"
+# third line, if present, contains the names already picked (but keeping the list intact)
+# Available rounds will be accessible in the app as well as an option to save the name picked
+
+>Unforgitables
+Paulo/Tiago/Miguel/Itamar/Joana Peixoto/Joana Vasconcelos/Joana Falcão/Mariana/João Romero/André/Sergio/Filipe/Jairson/Mike/Nuno/Milena
+>Round 4 Summarisers
+Paulo/Tiago/Miguel/Itamar/Joana Peixoto/Joana Vasconcelos/Joana Falcão/Mariana/João Romero/André/Sergio/Filipe/Jairson/Mike/Nuno/Milena
+Joana Falcão/Sergio/Jairson/Itamar/Joana Peixoto/Joana Vasconcelos/Paulo/Mariana/João Romero/André/Tiago/Filipe/Miguel/Mike/Nuno
+>Round 5 Summarisers
+Paulo/Tiago/Miguel/Itamar/Joana Peixoto/Joana Vasconcelos/Joana Falcão/Mariana/João Romero/André/Sergio/Filipe/Jairson/Mike/Nuno/Milena
+Joana Falcão/Sergio/Jairson

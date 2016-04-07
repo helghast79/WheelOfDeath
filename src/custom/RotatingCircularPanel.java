@@ -13,34 +13,25 @@ import java.util.Random;
  */
 public class RotatingCircularPanel extends JPanel {
 
-
-    //int count;
-double count;
-    int countToChangeAddToCount = 0;
-    int countChange = 5;
-    double addToCount = 20;
-    int acelerate = -1;
+    double count;
+    double countToChangeAddToCount = 0.0d;
+    double countChange = 5.0d;
+    double addToCount = 20.0d;
+    double acelerate = -1.0d;
+double pieAngle=1.0;
 
     Timer timer;
     Graphics2D g2d;
 
     boolean rotating = false;
 
-    //the angle that the panel will apply when rotate is called
-    double angleOfRotation = 0.0d;
-
-    // keep track of the current rotation
-    double angle =0.0d;
-
-    //parent class calls rotate method and the setAngle is set
-    double setAngle=0.0d;
-
-
+    double totalCount = 0.0d;
+    double targetCount = 0.0d;
 
     public RotatingCircularPanel() {
 
         setTimer();
-        //setMouseListener();
+        setMouseListener();
 
     }
 
@@ -48,11 +39,11 @@ double count;
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         g2d = (Graphics2D) g;
-        if (rotating) {
-            float x = this.getWidth() / 2.0f;
-            float y = this.getHeight() / 2.0f;
-            g2d.rotate(Math.toRadians(angle),x,y);//count / 180.0 * Math.PI, x, y);
-        }
+
+        float x = this.getWidth() / 2.0f;
+        float y = this.getHeight() / 2.0f;
+        g2d.rotate(count / 180.0 * Math.PI, x, y);
+
 
 
     }
@@ -66,91 +57,75 @@ double count;
     }
 
 
-    private void setTimer() {
+    public void setTimer() {
 
-        double dr = Math.floor(angleOfRotation)/angleOfRotation;
-
-
-
-        timer = new Timer(40, new ActionListener() {
+        timer = new Timer(100, new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+
+                //stop criteria
+                if (totalCount >= targetCount) {
+                    countChange = Math.round(targetCount/10);
+                    addToCount = 1.0d;
+                    totalCount = 0.0d;
+                    repaint();
+                    timer.stop();
+
+                    return;
+                }
+
+
                 //count += 10;
-               /* countToChangeAddToCount++;
+                countToChangeAddToCount++;
                 if (countToChangeAddToCount == countChange) {
                     addToCount = Math.max(1, addToCount + acelerate);
                     countToChangeAddToCount = 0;
-
-                    if(count >= setAngle){
-                        rotating = false;
-                    }
-
-                }*/
-
-                System.out.println(count);
-                if(count >= setAngle){
-                    rotating = false;
                 }
-
-                count += dr;
-
+                count += addToCount*pieAngle;
+                totalCount+=addToCount*pieAngle;
 
                 if (count > 360) count -= 360;
                 repaint();
-
-
             }
         });
 
     }
 
-   /* private void setMouseListener() {
+    private void setMouseListener() {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent m) {
-
-                //rotate(angleOfRotation);
-              rotate(1);
-                *//*if (rotating) {
-                    rotating = false;
-                    timer.stop();
-                    count = 0;
-                    addToCount = 10;
-                    repaint();
-                } else {
+                if (!timer.isRunning()) {
+                    targetCount = rand(600, 2500, 1);
+                    countChange = Math.round(targetCount/10);
+                    addToCount = 1.0d;
                     rotating = true;
                     timer.start();
-                }*//*
+                }
             }
         });
-    }*/
-
-public double getAngle(){
-    return this.angle;
-}
-
-    public void setAngleOfRotation(double angleToRotate){
-        angleOfRotation = angleToRotate;
     }
+
+    private double rand(int min, int max, int interval) {
+
+        return  (Math.round(((Math.random() * 1000 * (Math.floor((max - min) / interval))) / 1000)) * interval) + min;
+
+    }
+
+
 
     public void rotate(double angle){
-        rotating = true;
-        this.setAngle = angle;
-        setTimer();
-        timer.start();
-        //this.angle+=angle;
-        //repaint();
+
+        count =angle;
+        repaint();
     }
-    public void rotate(int positions){
-        rotating = true;
-        this.setAngle = positions*angleOfRotation;
-        setTimer();
-        timer.start();
-        //this.angle+=positions*angleOfRotation;
-        //paintComponent(g2d);
-        //repaint();
+
+    public void setPieAngle(double val){
+        pieAngle = val;
     }
+
+
 }
 
 
