@@ -8,6 +8,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -41,32 +42,45 @@ public class WheelOfDeath {
     double pieAngle;
 
 
+    //Settings
+    //background color
+    Color backgroundColor = new Color(40, 40, 40);
+    //size of the arrow
+    Dimension arrowDimension = new Dimension(50, 35);
+    //path to arrow image
+    String arrowFilePath = "resources/arrow.png";
+    //path to names list
+    String namesFilePath = "resources/names.txt";
 
 
     public static void main(String[] args) {
         WheelOfDeath wheelOfDeath = new WheelOfDeath();
+        wheelOfDeath.init();
+    }
+
+    private void init() {
+        createFrame();
+        createMenu();
+        createInfoLbl();
+        createLeftPanel();
+        createPanel2();
+
+        menuBar.setVisible(true);
+        jFrame.setVisible(true);
+
+        log("Load or create a pick list from the menu");
 
 
-        wheelOfDeath.createFrame();
-        wheelOfDeath.createMenu();
-        wheelOfDeath.createInfoLbl();
-        //wheelOfDeath.createPanel();
-
-        wheelOfDeath.menuBar.setVisible(true);
-        wheelOfDeath.jFrame.setVisible(true);
-
-        wheelOfDeath.log("Load or create a pick list from the menu");
-
-
-        wheelOfDeath.loadData("C:\\Users\\macha\\Desktop\\namesabc.txt");
+        loadData(namesFilePath);
 
     }
+
 
     private void start() {
         // System.out.println(((JRadioButtonMenuItem) (menu2_spin.getMenuComponent( MENU2_MODE_INIT_INDEX))).isSelected());
         // System.out.println(((JRadioButtonMenuItem) (menu2_spin.getMenuComponent( MENU2_MODE_INIT_INDEX+1))).isSelected());
         // System.out.println(((JRadioButtonMenuItem) (menu2_spin.getMenuComponent( MENU2_MODE_INIT_INDEX+2))).isSelected());
-
+        loadData(namesFilePath);
         createPanel();
 
 
@@ -76,6 +90,7 @@ public class WheelOfDeath {
 
         //initialize file read
         ReadFile fileRead = new ReadFile(filePath);
+
 
         //initialize arraylist of rounds
         ArrayList<PickList> pickLists = new ArrayList<PickList>();
@@ -142,6 +157,7 @@ public class WheelOfDeath {
             //give the user option to choose which list to load
             //return -1 means user canceled operation so don't do nothing
             int listPick = showDialogChooseList(listNames);
+
             if (listPick != -1) {
                 currentList = pickLists.get(listPick);
                 createRoundMenuCheckBoxes();
@@ -195,6 +211,41 @@ public class WheelOfDeath {
 
     }
 
+    private void createLeftPanel() {
+
+        ImageIcon imageIcon = new ImageIcon("resources/arrow.png");
+        Image img = imageIcon.getImage();
+        Image newimg = img.getScaledInstance((int) arrowDimension.getWidth(), (int) arrowDimension.getHeight(), java.awt.Image.SCALE_SMOOTH);
+        ImageIcon newIcon = new ImageIcon(newimg);
+
+        JLabel label = new JLabel("", newIcon, JLabel.CENTER);
+
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(label, BorderLayout.CENTER);
+        panel.setBackground(backgroundColor);
+        panel.setPreferredSize(arrowDimension);
+        panel.setVisible(true);
+
+        jFrame.add(panel, BorderLayout.WEST);
+    }
+
+
+    private void createPanel2(){
+
+        jPanel = new JPanel();
+        jPanel.setLayout(null);
+        jPanel.setBackground(backgroundColor);
+
+        jPanel.setPreferredSize(new Dimension(400, 400));
+        jPanel.setVisible(true);
+
+
+        jFrame.add(jPanel, BorderLayout.CENTER);
+        jFrame.pack();
+        jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+
+
     private void createPanel() {
         //list is empty
         if (currentList.getChooseList().size() <= 0) {
@@ -212,21 +263,13 @@ public class WheelOfDeath {
         //jPanel = costumPanel.getPanel();
         jPanel = new RotatingCircularPanel();
         jPanel.setLayout(new PieLayout());
+        jPanel.setBackground(backgroundColor);
 
         createPiePanels();
 
         jPanel.setPreferredSize(new Dimension(400, 400));
         jPanel.setVisible(true);
 
-
-       /* jPanel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent m) {
-
-                ((RotatingCircularPanel) (jPanel)).rotatePositions( rand(2, 10, 1) );
-            }
-        });
-*/
 
         jFrame.add(jPanel, BorderLayout.CENTER);
         jFrame.pack();
@@ -545,6 +588,8 @@ public class WheelOfDeath {
         String input = (String) JOptionPane.showInputDialog(null, "List picker",
                 "Choose one of the following lists", JOptionPane.QUESTION_MESSAGE, null, names, names[0]);
 
+        if(input == null) return -1;
+
         for (int i = 0; i < names.length; i++) {
             if (input.equals(names[i])) {
                 return (i);
@@ -644,6 +689,7 @@ public class WheelOfDeath {
         return (int) (Math.round(((Math.random() * 1000 * (Math.floor((max - min) / interval))) / 1000)) * interval) + min;
 
     }
+
     private double randDouble(double min, double max, double interval) {
 
         String text = Double.toString(Math.abs(interval));
