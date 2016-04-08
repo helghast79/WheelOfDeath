@@ -1,14 +1,11 @@
 package app;
 
-import custom.MyPiePanel;
-import custom.PieLayout;
-import custom.RotatingCircularPanel;
+import custom.*;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -27,6 +24,7 @@ public class WheelOfDeath {
 
     private JFrame jFrame;
     private JPanel jPanel;
+    private JPanel jLeftPanel;
     private JMenu menu1_list, menu2_spin, menu3_help;
     private JMenuBar menuBar;
 
@@ -40,7 +38,6 @@ public class WheelOfDeath {
 
     //circular pie
     double pieAngle;
-
 
     //Settings
     //background color
@@ -56,14 +53,16 @@ public class WheelOfDeath {
     public static void main(String[] args) {
         WheelOfDeath wheelOfDeath = new WheelOfDeath();
         wheelOfDeath.init();
+
     }
+
 
     private void init() {
         createFrame();
         createMenu();
         createInfoLbl();
         createLeftPanel();
-        createPanel2();
+        createPanel_empty();
 
         menuBar.setVisible(true);
         jFrame.setVisible(true);
@@ -72,7 +71,7 @@ public class WheelOfDeath {
 
 
         loadData(namesFilePath);
-
+        createPanel_Pie();
     }
 
 
@@ -80,8 +79,16 @@ public class WheelOfDeath {
         // System.out.println(((JRadioButtonMenuItem) (menu2_spin.getMenuComponent( MENU2_MODE_INIT_INDEX))).isSelected());
         // System.out.println(((JRadioButtonMenuItem) (menu2_spin.getMenuComponent( MENU2_MODE_INIT_INDEX+1))).isSelected());
         // System.out.println(((JRadioButtonMenuItem) (menu2_spin.getMenuComponent( MENU2_MODE_INIT_INDEX+2))).isSelected());
-        loadData(namesFilePath);
-        createPanel();
+
+        //wheel of death
+        if (((JRadioButtonMenuItem) (menu2_spin.getMenuComponent(MENU2_MODE_INIT_INDEX))).isSelected()) {
+            createPanel_Pie();
+        }
+
+        //death board
+        if (((JRadioButtonMenuItem) (menu2_spin.getMenuComponent(MENU2_MODE_INIT_INDEX + 1))).isSelected()) {
+            createPanel_board();
+        }
 
 
     }//end start
@@ -206,6 +213,8 @@ public class WheelOfDeath {
         infoLbl = new JLabel("ready");
         infoLbl.setFont(new Font(infoLbl.getName(), Font.PLAIN, 20));
         infoLbl.setHorizontalAlignment(SwingConstants.LEADING);
+        infoLbl.setBackground(backgroundColor);
+        infoLbl.setOpaque(true);
         infoLbl.setVisible(true);
         jFrame.add(infoLbl, BorderLayout.PAGE_END);
 
@@ -213,24 +222,24 @@ public class WheelOfDeath {
 
     private void createLeftPanel() {
 
-        ImageIcon imageIcon = new ImageIcon("resources/arrow.png");
+        ImageIcon imageIcon = new ImageIcon(arrowFilePath);
         Image img = imageIcon.getImage();
         Image newimg = img.getScaledInstance((int) arrowDimension.getWidth(), (int) arrowDimension.getHeight(), java.awt.Image.SCALE_SMOOTH);
         ImageIcon newIcon = new ImageIcon(newimg);
 
         JLabel label = new JLabel("", newIcon, JLabel.CENTER);
 
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.add(label, BorderLayout.CENTER);
-        panel.setBackground(backgroundColor);
-        panel.setPreferredSize(arrowDimension);
-        panel.setVisible(true);
+        jLeftPanel = new JPanel(new BorderLayout());
+        jLeftPanel.add(label, BorderLayout.CENTER);
+        jLeftPanel.setBackground(backgroundColor);
+        jLeftPanel.setPreferredSize(arrowDimension);
+        jLeftPanel.setVisible(true);
 
-        jFrame.add(panel, BorderLayout.WEST);
+        jFrame.add(jLeftPanel, BorderLayout.WEST);
     }
 
 
-    private void createPanel2(){
+    private void createPanel_empty() {
 
         jPanel = new JPanel();
         jPanel.setLayout(null);
@@ -246,7 +255,8 @@ public class WheelOfDeath {
     }
 
 
-    private void createPanel() {
+    //wheel of death
+    private void createPanel_Pie() {
         //list is empty
         if (currentList.getChooseList().size() <= 0) {
             log("Current pick list is empty");
@@ -265,7 +275,7 @@ public class WheelOfDeath {
         jPanel.setLayout(new PieLayout());
         jPanel.setBackground(backgroundColor);
 
-        createPiePanels();
+        createComponets_PiePanels();
 
         jPanel.setPreferredSize(new Dimension(400, 400));
         jPanel.setVisible(true);
@@ -275,10 +285,13 @@ public class WheelOfDeath {
         jFrame.pack();
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+
+        jLeftPanel.setVisible(true);
+
+
     }
 
-
-    private void createPiePanels() {
+    private void createComponets_PiePanels() {
         Set<String> chooseList = new HashSet<String>();
         int totalMenuComponents = menu1_list.getMenuComponentCount();
 
@@ -327,9 +340,96 @@ public class WheelOfDeath {
 
         }
 
-        //angle calculations
-        //((RotatingCircularPanel) (jPanel)).setAngleOfRotation(pieAngle);
-        //((RotatingCircularPanel) (jPanel)).setInitialAngle( pieAngle / 2);
+
+        //set angle so that the min rotation is exacly the angle between names
+        ((RotatingCircularPanel) (jPanel)).setPieAngle(pieAngle);
+
+        //when the list has even numbers the arrow points to the middle of two names
+        if (checkIfNumberIsEven(totalNames)) {
+            ((RotatingCircularPanel) (jPanel)).rotate(pieAngle / 2);
+        }
+
+    }
+
+    //death board
+    private void createPanel_board() {
+
+
+        //list is empty
+        if (currentList.getChooseList().size() <= 0) {
+            log("Current pick list is empty");
+            return;
+        }
+
+        //remove jPanel if it exists
+        if (jPanel != null) {
+            jPanel.removeAll();
+            jFrame.remove(jPanel);
+        }
+
+        //RotatingPanel costumPanel = new RotatingPanel();
+        //jPanel = costumPanel.getPanel();
+        jPanel = new DeathBoardPanel();
+        //jPanel.setLayout(new FlowLayout(FlowLayout.CENTER,5,5));
+
+        jPanel.setBackground(backgroundColor);
+
+        createComponets_Squares();
+
+        jPanel.setPreferredSize(new Dimension(400, 400));
+        jPanel.setVisible(true);
+
+
+        jFrame.add(jPanel, BorderLayout.CENTER);
+        jFrame.pack();
+        jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        jLeftPanel.setVisible(false);
+    }
+
+    private void createComponets_Squares() {
+        Set<String> chooseList = new HashSet<String>();
+        int totalMenuComponents = menu1_list.getMenuComponentCount();
+
+        //add elements to the picker
+        for (int i = MENU1_LIST_NAME_INDEX + 2; i < totalMenuComponents; i++) {
+            if (((JCheckBoxMenuItem2) (menu1_list.getMenuComponent(i))).getState() == true) {
+                chooseList.add(((JCheckBoxMenuItem2) (menu1_list.getMenuComponent(i))).getText());
+
+            }
+
+        }
+
+
+        Object[] chooseNames = chooseList.toArray();
+
+        Color[] colors = {Color.GRAY, Color.cyan, Color.RED, Color.GREEN, Color.PINK, Color.WHITE, Color.MAGENTA, Color.YELLOW, Color.BLUE, Color.ORANGE, Color.GRAY,
+                Color.cyan, Color.RED, Color.GREEN, Color.PINK, Color.WHITE, Color.MAGENTA};
+
+
+        int totalNames = chooseNames.length;
+
+        int itemsPerRow = (int) Math.ceil(Math.sqrt(totalNames));
+        int itemsPerCol = (int) Math.ceil(Math.sqrt(totalNames));
+        Dimension squareSize = new Dimension((int)Math.round(400 *0.9/ itemsPerCol), (int)Math.round(400 *0.9/ itemsPerRow));
+
+        //now that we have the dimension of the items, we can set the layout
+        jPanel.setLayout(new GridLayout(itemsPerRow, itemsPerCol));
+
+
+        for (int i = 0; i < totalNames; i++) {
+
+            JLabel label = new JLabel(chooseNames[i].toString());
+            label.setPreferredSize(squareSize);
+            label.setHorizontalAlignment(SwingConstants.CENTER);
+            label.setOpaque(true);
+            label.setBackground(colors[i]);
+            label.setName(chooseNames[i].toString());
+            label.setVisible(true);
+            jPanel.add(label);
+
+
+        }
 
 
     }
@@ -575,10 +675,12 @@ public class WheelOfDeath {
         //remove/add to ignore list based on checkbox value
         if (justClicked.getState()) {
             currentList.removeFromIgnoreList(justClicked.getText());
+
         } else {
             currentList.addToIgnoreList(justClicked.getText());
-        }
 
+        }
+        start();
 
     }
 
@@ -588,7 +690,7 @@ public class WheelOfDeath {
         String input = (String) JOptionPane.showInputDialog(null, "List picker",
                 "Choose one of the following lists", JOptionPane.QUESTION_MESSAGE, null, names, names[0]);
 
-        if(input == null) return -1;
+        if (input == null) return -1;
 
         for (int i = 0; i < names.length; i++) {
             if (input.equals(names[i])) {
@@ -716,6 +818,10 @@ public class WheelOfDeath {
 
         return (b * interval) + min;
 
+    }
+
+    private boolean checkIfNumberIsEven(int x) {
+        return ((x % 2) == 0);
     }
 
 

@@ -13,19 +13,20 @@ import java.util.Random;
  */
 public class RotatingCircularPanel extends JPanel {
 
-    int count;
-    int countToChangeAddToCount = 0;
-    int countChange = 5;
-    int addToCount = 20;
-    int acelerate = -1;
+    double count;
+    double countToChangeAddToCount = 0.0d;
+    double countChange = 5.0d;
+    double addToCount = 20.0d;
+    double acelerate = -1.0d;
+double pieAngle=1.0;
 
     Timer timer;
     Graphics2D g2d;
 
     boolean rotating = false;
 
-    int totalCount = 0;
-    int targetCount = 0;
+    double totalCount = 0.0d;
+    double targetCount = 0.0d;
 
     public RotatingCircularPanel() {
 
@@ -39,9 +40,9 @@ public class RotatingCircularPanel extends JPanel {
         super.paintComponent(g);
         g2d = (Graphics2D) g;
 
-            float x = this.getWidth() / 2.0f;
-            float y = this.getHeight() / 2.0f;
-            g2d.rotate(count / 180.0 * Math.PI, x, y);
+        float x = this.getWidth() / 2.0f;
+        float y = this.getHeight() / 2.0f;
+        g2d.rotate(count / 180.0 * Math.PI, x, y);
 
 
 
@@ -58,7 +59,7 @@ public class RotatingCircularPanel extends JPanel {
 
     public void setTimer() {
 
-        timer = new Timer(40, new ActionListener() {
+        timer = new Timer(100, new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -66,8 +67,8 @@ public class RotatingCircularPanel extends JPanel {
                 //stop criteria
                 if (totalCount >= targetCount) {
                     countChange = Math.round(targetCount/10);
-                    addToCount = 20;
-                    totalCount = 0;
+                    addToCount = 1.0d;
+                    totalCount = 0.0d;
                     repaint();
                     timer.stop();
 
@@ -81,8 +82,8 @@ public class RotatingCircularPanel extends JPanel {
                     addToCount = Math.max(1, addToCount + acelerate);
                     countToChangeAddToCount = 0;
                 }
-                count += addToCount;
-                totalCount+=addToCount;
+                count += addToCount*pieAngle;
+                totalCount+=addToCount*pieAngle;
 
                 if (count > 360) count -= 360;
                 repaint();
@@ -96,9 +97,9 @@ public class RotatingCircularPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent m) {
                 if (!timer.isRunning()) {
-                    targetCount = rand(1999, 2000, 1);
+                    targetCount = rand(600, 2500, 1);
                     countChange = Math.round(targetCount/10);
-                    addToCount = 20;
+                    addToCount = 1.0d;
                     rotating = true;
                     timer.start();
                 }
@@ -106,10 +107,22 @@ public class RotatingCircularPanel extends JPanel {
         });
     }
 
-    private int rand(int min, int max, int interval) {
+    private double rand(int min, int max, int interval) {
 
-        return (int) (Math.round(((Math.random() * 1000 * (Math.floor((max - min) / interval))) / 1000)) * interval) + min;
+        return  (Math.round(((Math.random() * 1000 * (Math.floor((max - min) / interval))) / 1000)) * interval) + min;
 
+    }
+
+
+
+    public void rotate(double angle){
+
+        count =angle;
+        repaint();
+    }
+
+    public void setPieAngle(double val){
+        pieAngle = val;
     }
 
 
