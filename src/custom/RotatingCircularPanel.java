@@ -97,7 +97,7 @@ double pieAngle=1.0;
             @Override
             public void mouseClicked(MouseEvent m) {
                 if (!timer.isRunning()) {
-                    targetCount = rand(600, 2500, 1);
+                    targetCount = rand(800, 3000, 10);
                     countChange = Math.round(targetCount/10);
                     addToCount = 1.0d;
                     rotating = true;
