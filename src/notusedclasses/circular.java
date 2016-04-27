@@ -1,4 +1,4 @@
-package app;
+package notusedclasses;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;

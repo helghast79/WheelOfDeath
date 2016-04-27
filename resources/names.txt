@@ -3,6 +3,7 @@
 # second line will contain all the names for the lottery pick up, all names should be separated by slash "/"
 # third line, if present, contains the names already picked (but keeping the list intact)
 # Available rounds will be accessible in the app as well as an option to save the name picked
+# This file is for testing purposes only
 
 >Unforgitables
 Paulo/Tiago/Miguel/Itamar/Joana Peixoto/Joana Vasconcelos/Joana Falcão/Mariana/João Romero/André/Sergio/Filipe/Jairson/Mike/Nuno/Milena

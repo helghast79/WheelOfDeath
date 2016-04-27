@@ -12,9 +12,9 @@ import java.io.*;
 public class ReadFile {
 
     private InputStream in;
-    private String filename;
+    private String filename = "";
     private int currentLineNumber;
-
+    private File file;
 
     /**
      * Initializes a newly created object of ReadFile.
@@ -23,6 +23,12 @@ public class ReadFile {
      */
     public ReadFile(String filename) {
         this.filename = filename;
+
+        currentLineNumber = 0;
+    }
+
+    public ReadFile(File file) {
+        this.file = file;
 
         currentLineNumber = 0;
     }
@@ -40,8 +46,14 @@ public class ReadFile {
         String content = "";
 
         try {
-            in = new FileInputStream(filename);
-            Reader      inputStreamReader = new InputStreamReader(in);
+            if (filename.equals("")) {
+                in = new FileInputStream(file);
+            } else {
+                in = new FileInputStream(filename);
+            }
+
+
+            Reader inputStreamReader = new InputStreamReader(in);
             BufferedReader br = new BufferedReader(inputStreamReader);
 
             int lineIndex = 0;
@@ -86,8 +98,12 @@ public class ReadFile {
         String content = "";
 
         try {
-            in = new FileInputStream(filename);
-            Reader      inputStreamReader = new InputStreamReader(in);
+            if (filename.equals("")) {
+                in = new FileInputStream(file);
+            } else {
+                in = new FileInputStream(filename);
+            }
+            Reader inputStreamReader = new InputStreamReader(in);
             BufferedReader br = new BufferedReader(inputStreamReader);
 
             int lineIndex = 0;

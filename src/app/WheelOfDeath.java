@@ -6,8 +6,8 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -28,12 +28,12 @@ public class WheelOfDeath {
     private JMenu menu1_list, menu2_spin, menu3_help;
     private JMenuBar menuBar;
 
-    private JLabel infoLbl;
+    // private JLabel infoLbl;
 
 
     //menu 1 has a item which contains the current list name, it's index is needed for updating menu 1 when list changes
     private final int MENU1_LIST_NAME_INDEX = 4;
-    private final int MENU2_MODE_INIT_INDEX = 2;
+    private final int MENU2_MODE_INIT_INDEX = 0;
 
 
     //circular pie
@@ -45,9 +45,9 @@ public class WheelOfDeath {
     //size of the arrow
     Dimension arrowDimension = new Dimension(50, 35);
     //path to arrow image
-    String arrowFilePath = "resources/arrow.png";
+    String arrowFilePath = "/arrow.png";
     //path to names list
-    String namesFilePath = "resources/names.txt";
+    String namesFilePath = "/names.txt";
 
 
     public static void main(String[] args) {
@@ -60,25 +60,21 @@ public class WheelOfDeath {
     private void init() {
         createFrame();
         createMenu();
-        createInfoLbl();
+
         createLeftPanel();
         createPanel_empty();
 
         menuBar.setVisible(true);
         jFrame.setVisible(true);
 
-        log("Load or create a pick list from the menu");
+        loadDataFromResource();
 
 
-        loadData(namesFilePath);
         createPanel_Pie();
     }
 
 
     private void start() {
-        // System.out.println(((JRadioButtonMenuItem) (menu2_spin.getMenuComponent( MENU2_MODE_INIT_INDEX))).isSelected());
-        // System.out.println(((JRadioButtonMenuItem) (menu2_spin.getMenuComponent( MENU2_MODE_INIT_INDEX+1))).isSelected());
-        // System.out.println(((JRadioButtonMenuItem) (menu2_spin.getMenuComponent( MENU2_MODE_INIT_INDEX+2))).isSelected());
 
         //wheel of death
         if (((JRadioButtonMenuItem) (menu2_spin.getMenuComponent(MENU2_MODE_INIT_INDEX))).isSelected()) {
@@ -93,11 +89,45 @@ public class WheelOfDeath {
 
     }//end start
 
-    public void loadData(String filePath) {
 
-        //initialize file read
-        ReadFile fileRead = new ReadFile(filePath);
+    //load data
+    private void loadDataFromFile(String filePath) {
+        loadData(new ReadFile(filePath));
 
+    }//end init
+
+    private void loadDataFromResource() {
+
+        //load file from resources or from within jar (creating temporary file)
+        File file = null;
+        String resource = namesFilePath;
+        URL res = getClass().getResource(resource);
+
+        if (res.toString().startsWith("jar:")) {
+            try {
+                InputStream input = getClass().getResourceAsStream(resource);
+                file = File.createTempFile("tempfile", ".tmp");
+                OutputStream out = new FileOutputStream(file);
+                int read;
+                byte[] bytes = new byte[1024];
+
+                while ((read = input.read(bytes)) != -1) {
+                    out.write(bytes, 0, read);
+                }
+                file.deleteOnExit();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        } else {
+            //this will work in IDE, but not from a JAR
+            file = new File(res.getFile());
+        }
+
+        loadData(new ReadFile(file));
+
+    }//end init
+
+    private void loadData(ReadFile fileRead) {
 
         //initialize arraylist of rounds
         ArrayList<PickList> pickLists = new ArrayList<PickList>();
@@ -170,13 +200,11 @@ public class WheelOfDeath {
                 createRoundMenuCheckBoxes();
             }
         }
+    }
 
-
-    }//end init
 
     private void createFrame() {
-        jFrame = new JFrame("Wheel of Death");
-        //jFrame.getContentPane().add(new JLabel(" HEY!!!"));
+        jFrame = new JFrame("All but me...");
         jFrame.setUndecorated(false);
         jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         jFrame.setSize(300, 500);
@@ -191,8 +219,8 @@ public class WheelOfDeath {
 
         //Build the first menu.
         menu1_list = new JMenu("List");
-        menu2_spin = new JMenu("Spin");
-        menu3_help = new JMenu("Help");
+        menu2_spin = new JMenu("Modes");
+        menu3_help = new JMenu("About");
 
 
         setMenu1Items();
@@ -209,20 +237,15 @@ public class WheelOfDeath {
         jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
-    private void createInfoLbl() {
-        infoLbl = new JLabel("ready");
-        infoLbl.setFont(new Font(infoLbl.getName(), Font.PLAIN, 20));
-        infoLbl.setHorizontalAlignment(SwingConstants.LEADING);
-        infoLbl.setBackground(backgroundColor);
-        infoLbl.setOpaque(true);
-        infoLbl.setVisible(true);
-        jFrame.add(infoLbl, BorderLayout.PAGE_END);
-
-    }
-
     private void createLeftPanel() {
 
-        ImageIcon imageIcon = new ImageIcon(arrowFilePath);
+
+        //JOptionPane.showMessageDialog(jFrame,resource.getPath());
+        //ImageIcon imageIcon = new ImageIcon(arrowFilePath);
+
+        ImageIcon imageIcon = new ImageIcon(this.getClass().getResource(arrowFilePath));
+
+
         Image img = imageIcon.getImage();
         Image newimg = img.getScaledInstance((int) arrowDimension.getWidth(), (int) arrowDimension.getHeight(), java.awt.Image.SCALE_SMOOTH);
         ImageIcon newIcon = new ImageIcon(newimg);
@@ -259,7 +282,7 @@ public class WheelOfDeath {
     private void createPanel_Pie() {
         //list is empty
         if (currentList.getChooseList().size() <= 0) {
-            log("Current pick list is empty");
+            //log("Current pick list is empty");
             return;
         }
 
@@ -305,24 +328,11 @@ public class WheelOfDeath {
         }
 
 
-
-        /*Set<String> chooseList = currentList.getChooseList();
-        Iterator ignoreIt = currentList.getIgnoreList().iterator();
-
-        while(ignoreIt.hasNext()){
-            chooseList.remove(ignoreIt.next());
-        }
-*/
         Object[] chooseNames = chooseList.toArray();
-
-        Color[] colors = {Color.GRAY, Color.cyan, Color.RED, Color.GREEN, Color.PINK, Color.WHITE, Color.MAGENTA, Color.YELLOW, Color.BLUE, Color.ORANGE, Color.GRAY,
-                Color.cyan, Color.RED, Color.GREEN, Color.PINK, Color.WHITE, Color.MAGENTA};
 
 
         int totalNames = chooseNames.length;
         pieAngle = 360.0d / (totalNames);
-
-        //float rest = (360- (totalNames*pieAngle))/totalNames;
 
 
         for (int i = 0; i < totalNames; i++) {
@@ -330,7 +340,8 @@ public class WheelOfDeath {
             double start = i * pieAngle;
             double finish = start + pieAngle;
 
-            MyPiePanel pie = new MyPiePanel(colors[i], start, finish, chooseNames[i].toString());
+            //MyPiePanel pie = new MyPiePanel(colors[i], start, finish, chooseNames[i].toString());
+            MyPiePanel pie = new MyPiePanel(new Color(rand(0, 255, 1), rand(0, 255, 1), rand(0, 255, 1)), start, finish, chooseNames[i].toString());
             pie.setName(chooseNames[i].toString());
 
 
@@ -351,13 +362,14 @@ public class WheelOfDeath {
 
     }
 
+
     //death board
     private void createPanel_board() {
 
 
         //list is empty
         if (currentList.getChooseList().size() <= 0) {
-            log("Current pick list is empty");
+            //log("Current pick list is empty");
             return;
         }
 
@@ -367,10 +379,8 @@ public class WheelOfDeath {
             jFrame.remove(jPanel);
         }
 
-        //RotatingPanel costumPanel = new RotatingPanel();
-        //jPanel = costumPanel.getPanel();
         jPanel = new DeathBoardPanel();
-        //jPanel.setLayout(new FlowLayout(FlowLayout.CENTER,5,5));
+
 
         jPanel.setBackground(backgroundColor);
 
@@ -403,15 +413,12 @@ public class WheelOfDeath {
 
         Object[] chooseNames = chooseList.toArray();
 
-        Color[] colors = {Color.GRAY, Color.cyan, Color.RED, Color.GREEN, Color.PINK, Color.WHITE, Color.MAGENTA, Color.YELLOW, Color.BLUE, Color.ORANGE, Color.GRAY,
-                Color.cyan, Color.RED, Color.GREEN, Color.PINK, Color.WHITE, Color.MAGENTA};
-
 
         int totalNames = chooseNames.length;
 
         int itemsPerRow = (int) Math.ceil(Math.sqrt(totalNames));
         int itemsPerCol = (int) Math.ceil(Math.sqrt(totalNames));
-        Dimension squareSize = new Dimension((int)Math.round(400 *0.9/ itemsPerCol), (int)Math.round(400 *0.9/ itemsPerRow));
+        Dimension squareSize = new Dimension((int) Math.round(400 * 0.9 / itemsPerCol), (int) Math.round(400 * 0.9 / itemsPerRow));
 
         //now that we have the dimension of the items, we can set the layout
         jPanel.setLayout(new GridLayout(itemsPerRow, itemsPerCol));
@@ -423,7 +430,7 @@ public class WheelOfDeath {
             label.setPreferredSize(squareSize);
             label.setHorizontalAlignment(SwingConstants.CENTER);
             label.setOpaque(true);
-            label.setBackground(colors[i]);
+            label.setBackground(new Color(rand(0, 255, 1), rand(0, 255, 1), rand(0, 255, 1)));
             label.setName(chooseNames[i].toString());
             label.setVisible(true);
             jPanel.add(label);
@@ -451,7 +458,7 @@ public class WheelOfDeath {
         //add action listeners
         menu1Item1_new.addActionListener(new ActionListener() { //new list
             public void actionPerformed(ActionEvent e) {
-                //Todo: add new dialog to input names
+
                 click_new_list();
             }//end actionperformed
 
@@ -485,7 +492,7 @@ public class WheelOfDeath {
     private void setMenu2Items() {
 
         //declare JMenuItems
-        JCheckBoxMenuItem2 menu2Item1_enableRepetition;
+        //JCheckBoxMenuItem2 menu2Item1_enableRepetition;
 
         //radio button group to choose mode
         ButtonGroup group = new ButtonGroup();
@@ -494,29 +501,20 @@ public class WheelOfDeath {
         rbModeWheelOfDeath = new JRadioButtonMenuItem("Wheel of death");
         rbModeWheelOfDeath.setSelected(true);
         group.add(rbModeWheelOfDeath);
+        rbModeWheelOfDeath.addActionListener(new ActionListener() { //start random picker wheel
+            public void actionPerformed(ActionEvent e) {
+                //start random picker wheel
+                click_start_wheel();
+            }
+
+        });
+
 
         JRadioButtonMenuItem rbModeDeathBoard;
         rbModeDeathBoard = new JRadioButtonMenuItem("Death Board");
         rbModeDeathBoard.setSelected(true);
         group.add(rbModeDeathBoard);
-
-        JRadioButtonMenuItem rbModeCircleOfDeath;
-        rbModeCircleOfDeath = new JRadioButtonMenuItem("Circle of Death");
-        rbModeCircleOfDeath.setSelected(true);
-        group.add(rbModeCircleOfDeath);
-
-
-        JCheckBoxMenuItem2 menu2Item2_modeTiledBoard;
-        JMenuItem menu2Item3_start;
-
-        //Instantiate JMenuItems on each item to be added
-        menu2Item1_enableRepetition = new JCheckBoxMenuItem2("Enable repetition", null, false);
-        menu2Item2_modeTiledBoard = new JCheckBoxMenuItem2("Tiled Board Mode", null, false);
-        menu2Item3_start = new JMenuItem("Start");
-
-
-        //add action listeners
-        menu2Item3_start.addActionListener(new ActionListener() { //start random picker wheel
+        rbModeDeathBoard.addActionListener(new ActionListener() { //start random picker wheel
             public void actionPerformed(ActionEvent e) {
                 //start random picker wheel
                 click_start_wheel();
@@ -526,13 +524,13 @@ public class WheelOfDeath {
 
 
         //add the items including separators to the menu1
-        menu2_spin.add(menu2Item1_enableRepetition);
-        menu2_spin.addSeparator();
+        //menu2_spin.add(menu2Item1_enableRepetition);
+        //menu2_spin.addSeparator();
         menu2_spin.add(rbModeWheelOfDeath);
         menu2_spin.add(rbModeDeathBoard);
-        menu2_spin.add(rbModeCircleOfDeath);
-        menu2_spin.addSeparator();
-        menu2_spin.add(menu2Item3_start);
+        //menu2_spin.add(rbModeCircleOfDeath);
+        //menu2_spin.addSeparator();
+        //menu2_spin.add(menu2Item3_start);
     }
 
     private void setMenu3Items() {
@@ -541,11 +539,16 @@ public class WheelOfDeath {
         JMenuItem menu3Item1_about;
 
         //Instantiate JMenuItems on each item to be added
-        menu3Item1_about = new JMenuItem("About");
+        menu3Item1_about = new JMenuItem("Author");
 
         //add action listeners
         menu3Item1_about.addActionListener(new ActionListener() { //new list
             public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(jFrame,
+                        " ---------- Written by: ---------- \n\n" +
+                                "          Miguel Chambel\n\n" +
+                                "              05/04/2016\n\n");
+
                 //splash screen help
             }
 
@@ -559,6 +562,37 @@ public class WheelOfDeath {
     //Menu 1 - item 1 - new list click event
     private void click_new_list() {
 
+        String listName = JOptionPane.showInputDialog(null, "List Name:", "New List", JOptionPane.QUESTION_MESSAGE);
+
+        //check no input
+        if (listName == null) {
+            return;
+        }
+
+        if (listName.equals("")) {
+            return;
+        }
+
+
+        String allNames = JOptionPane.showInputDialog(null, "Enter names:\n(separated by '/')", listName, JOptionPane.QUESTION_MESSAGE);
+
+        String[] names = allNames.split("/");
+
+        if (names.length > 1) {
+            PickList thisList = new PickList(listName);
+
+            for (String n : names) {
+                thisList.addToChooseList(n);
+            }
+
+            currentList = thisList;
+            createRoundMenuCheckBoxes();
+            start();
+
+
+        }
+
+        //JOptionPane.showMessageDialog(jFrame, "Under Construction...");
     }
 
     //Menu 1 - item 2 - open file click event
@@ -573,8 +607,8 @@ public class WheelOfDeath {
 
         if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
             // load from file
-            loadData(chooser.getSelectedFile().getPath());
-
+            loadDataFromFile(chooser.getSelectedFile().getPath());
+            start();
         }
     }
 
@@ -825,11 +859,6 @@ public class WheelOfDeath {
     }
 
 
-    private void log(String message) {
-        infoLbl.setText(message);
-    }
-
-
     /**
      * This is a standard checkbox menu item but selecting it does not close the menu
      */
@@ -881,23 +910,4 @@ public class WheelOfDeath {
 
 
 
-
-/*
-//How to pass an argumento inside abstract inner classes-----------------------------
-
-jmi.addActionListener(new ActionListener() {
-        private int awesomeVariable; //will get the reference of "externalVariable" after init
-
-        public void actionPerformed(ActionEvent e) {
-           //some method with the awesomeVariable that now has the reference to the "externalVariable"
-        }
-
-        private ActionListener init(int externalVariable) {
-           awesomeVariable = externalVariable;
-           return this;
-        }
-
-    }.init(someExternalVariableToBePassedInside));
-//-------------------------------------------------------------------------------------
-*/
 

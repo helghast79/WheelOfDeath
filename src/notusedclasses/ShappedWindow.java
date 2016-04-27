@@ -1,4 +1,4 @@
-package app;
+package notusedclasses;
 
 /**
  * Created by macha on 10/03/2016.

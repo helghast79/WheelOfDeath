@@ -1,19 +1,12 @@
 package custom;
 
-import javax.swing.*;
+
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Random;
 
 /**
  * Created by macha on 02/04/2016.
  */
 public class PieLayout implements LayoutManager{
-    ArrayList components;
-
-    ArrayList names;
 
     private boolean isCircle;
 
@@ -97,7 +90,7 @@ public class PieLayout implements LayoutManager{
                 int y_offset = parentHeight>size ? (int)(parentHeight-size)/2 : 0;
 
 
-                comp.setBounds(x_offset, y_offset, size,size);
+               comp.setBounds(x_offset, y_offset, size,size);
 
             }
         }
