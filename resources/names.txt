@@ -5,11 +5,6 @@
 # Available rounds will be accessible in the app as well as an option to save the name picked
 # This file is for testing purposes only
 
->Unforgitables
-Paulo/Tiago/Miguel/Itamar/Joana Peixoto/Joana Vasconcelos/Joana Falcão/Mariana/João Romero/André/Sergio/Filipe/Jairson/Mike/Nuno/Milena
->Round 4 Summarisers
-Paulo/Tiago/Miguel/Itamar/Joana Peixoto/Joana Vasconcelos/Joana Falcão/Mariana/João Romero/André/Sergio/Filipe/Jairson/Mike/Nuno/Milena
-Joana Falcão/Sergio/Jairson/Itamar/Joana Peixoto/Joana Vasconcelos/Paulo/Mariana/João Romero/André/Tiago/Filipe/Miguel/Mike/Nuno
->Round 5 Summarisers
-Paulo/Tiago/Miguel/Itamar/Joana Peixoto/Joana Vasconcelos/Joana Falcão/Mariana/João Romero/André/Sergio/Filipe/Jairson/Mike/Nuno/Milena
-Joana Falcão/Sergio/Jairson
+>Test List
+name1/name2/name3/name5/name6
+name3/name6

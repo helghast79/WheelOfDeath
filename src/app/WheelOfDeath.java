@@ -32,7 +32,7 @@ public class WheelOfDeath {
 
 
     //menu 1 has a item which contains the current list name, it's index is needed for updating menu 1 when list changes
-    private final int MENU1_LIST_NAME_INDEX = 4;
+    private final int MENU1_LIST_NAME_INDEX = 7;
     private final int MENU2_MODE_INIT_INDEX = 0;
 
 
@@ -445,7 +445,7 @@ public class WheelOfDeath {
     private void setMenu1Items() {
 
         //declare JMenuItems
-        JMenuItem menu1Item1_new, menu1Item2_open, menu1Item3_save, menu1Item4_name;
+        JMenuItem menu1Item1_new, menu1Item2_open, menu1Item3_save, menu1Item4_name, menu1Item5_add, menu1Item6_remove;
 
         //Instantiate JMenuItems on each item to be added
         menu1Item1_new = new JMenuItem("Create new list");
@@ -453,37 +453,52 @@ public class WheelOfDeath {
         menu1Item3_save = new JMenuItem("Save current list");
         menu1Item4_name = new JMenuItem("no list selected");
         menu1Item4_name.setEnabled(false);
+        menu1Item5_add = new JMenuItem("Add name to list");
+        menu1Item6_remove = new JMenuItem("remove name from list");
 
 
         //add action listeners
         menu1Item1_new.addActionListener(new ActionListener() { //new list
             public void actionPerformed(ActionEvent e) {
-
                 click_new_list();
             }//end actionperformed
 
-        });//end new list ---
+        });//new list ---
 
         menu1Item2_open.addActionListener(new ActionListener() { //open file
             public void actionPerformed(ActionEvent e) {
                 click_open_file();
             }//end actionperformed --
-        });//end open file ---
+        });//open file ---
 
         menu1Item3_save.addActionListener(new ActionListener() { //save file
             public void actionPerformed(ActionEvent e) {
-
                 click_save_file();
-
             }//end actionperformed --
 
-        });//end save file ----
+        });//save file ----
 
+        menu1Item5_add.addActionListener(new ActionListener() { //add name to list
+            public void actionPerformed(ActionEvent e) {
+                click_add_name();
+            }//end actionperformed --
+
+        });//add name to list ----
+
+        menu1Item6_remove.addActionListener(new ActionListener() { //remove name
+            public void actionPerformed(ActionEvent e) {
+                click_remove_name();
+            }//end actionperformed --
+
+        });//remove name  ----
 
         //add the items including separators to the menu1
         menu1_list.add(menu1Item1_new);
         menu1_list.add(menu1Item2_open);
         menu1_list.add(menu1Item3_save);
+        menu1_list.addSeparator();
+        menu1_list.add(menu1Item5_add);
+        menu1_list.add(menu1Item6_remove);
         menu1_list.addSeparator();
         menu1_list.add(menu1Item4_name);
         menu1_list.addSeparator();
@@ -562,7 +577,7 @@ public class WheelOfDeath {
     //Menu 1 - item 1 - new list click event
     private void click_new_list() {
 
-        String listName = JOptionPane.showInputDialog(null, "List Name:", "New List", JOptionPane.QUESTION_MESSAGE);
+        String listName = JOptionPane.showInputDialog(jFrame, "List Name:", "New List", JOptionPane.QUESTION_MESSAGE);
 
         //check no input
         if (listName == null) {
@@ -574,7 +589,7 @@ public class WheelOfDeath {
         }
 
 
-        String allNames = JOptionPane.showInputDialog(null, "Enter names:\n(separated by '/')", listName, JOptionPane.QUESTION_MESSAGE);
+        String allNames = JOptionPane.showInputDialog(jFrame, "Enter names:\n(separated by '/')", listName, JOptionPane.QUESTION_MESSAGE);
 
         String[] names = allNames.split("/");
 
@@ -605,7 +620,7 @@ public class WheelOfDeath {
         chooser.addChoosableFileFilter(txtFilter);
         chooser.setFileFilter(txtFilter);
 
-        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+        if (chooser.showOpenDialog(jFrame) == JFileChooser.APPROVE_OPTION) {
             // load from file
             loadDataFromFile(chooser.getSelectedFile().getPath());
             start();
@@ -622,7 +637,7 @@ public class WheelOfDeath {
         chooser.addChoosableFileFilter(txtFilter);
         chooser.setFileFilter(txtFilter);
 
-        chooser.showSaveDialog(null);
+        chooser.showSaveDialog(jFrame);
 
         //get file extension
         File file = chooser.getSelectedFile();
@@ -652,6 +667,55 @@ public class WheelOfDeath {
         saveListToFile(file);
 
     }
+
+    //Menu 1 - item 4 - add name click event
+    private void click_add_name() {
+
+        String name = JOptionPane.showInputDialog(jFrame, "Enter name:", "Add Name to " + currentList.getName(), JOptionPane.QUESTION_MESSAGE);
+
+        //check no input
+        if (name == null) {
+            return;
+        }
+
+        if (name.equals("")) {
+            return;
+        }
+
+
+        currentList.addToChooseList(name);
+
+        createRoundMenuCheckBoxes();
+        start();
+
+    }
+
+    //Menu 1 - item 5 - remove name click event
+    private void click_remove_name() {
+
+        Object o = JOptionPane.showInputDialog(jFrame,
+                "Choose name:",
+                "Remove name from " + currentList.getName(),
+                JOptionPane.QUESTION_MESSAGE,
+                null, currentList.getChooseList().toArray(), null);
+        //check no input
+        if (o == null) {
+            return;
+        }
+
+        String name = o.toString();
+
+        if (name.equals("")) {
+            return;
+        }
+
+
+        currentList.removeFromChooseList(name);
+        createRoundMenuCheckBoxes();
+        start();
+
+    }
+
 
     //Menu 2 - item 2 - save file click event
     private void click_start_wheel() {
